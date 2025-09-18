@@ -4,7 +4,7 @@
 
 ## Introduction
 
-git init
+Trip Planner leverages the CrewAI framework to automate and enhance the trip planning experience, integrating a CLI, FASTAPI, and a user-friendly Streamlit interface.
 
 
 ## CrewAI Framework
