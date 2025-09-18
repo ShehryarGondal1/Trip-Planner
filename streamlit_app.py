@@ -6,6 +6,12 @@ import datetime
 import sys
 from langchain_openai import OpenAI
 
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+
+api_key = os.getenv("GEMINI_API_KEY")
 
 st.set_page_config(page_icon="✈️", layout="wide")
 
@@ -27,11 +33,18 @@ class TripCrew:
         # Convert date_range to string format for better handling
         self.date_range = f"{date_range[0].strftime('%Y-%m-%d')} to {date_range[1].strftime('%Y-%m-%d')}"
         self.output_placeholder = st.empty()
-        self.llm = LLM(model="gemini/gemini-2.0-flash")
+        #self.llm = LLM(model="gemini/gemini-2.0-flash")
         # self.llm = OpenAI(
         #     temperature=0.7,
         #     model_name="gpt-4",
         # )
+
+
+
+        self.llm = LLM(
+        model="gemini/gemini-2.0-flash",
+        api_key=api_key  # <-- Make sure this argument is supported
+        )
 
     def run(self):
         try:
@@ -112,24 +125,24 @@ if __name__ == "__main__":
 
         st.divider()
 
-        # Credits to joaomdmoura/CrewAI for the code: https://github.com/joaomdmoura/crewAI
-        st.sidebar.markdown(
-        """
-        Credits to [**@joaomdmoura**](https://twitter.com/joaomdmoura)
-        for creating **crewAI** 🚀
-        """,
-            unsafe_allow_html=True
-        )
+        # # Credits to joaomdmoura/CrewAI for the code: https://github.com/joaomdmoura/crewAI
+        # st.sidebar.markdown(
+        # """
+        # Credits to [**@joaomdmoura**](https://twitter.com/joaomdmoura)
+        # for creating **crewAI** 🚀
+        # """,
+        #     unsafe_allow_html=True
+        # )
 
-        st.sidebar.info("Click the logo to visit GitHub repo", icon="👇")
-        st.sidebar.markdown(
-            """
-        <a href="https://github.com/joaomdmoura/crewAI" target="_blank">
-            <img src="https://raw.githubusercontent.com/joaomdmoura/crewAI/main/docs/crewai_logo.png" alt="CrewAI Logo" style="width:100px;"/>
-        </a>
-        """,
-            unsafe_allow_html=True
-        )
+        # st.sidebar.info("Click the logo to visit GitHub repo", icon="👇")
+        # st.sidebar.markdown(
+        #     """
+        # <a href="https://github.com/joaomdmoura/crewAI" target="_blank">
+        #     <img src="https://raw.githubusercontent.com/joaomdmoura/crewAI/main/docs/crewai_logo.png" alt="CrewAI Logo" style="width:100px;"/>
+        # </a>
+        # """,
+        #     unsafe_allow_html=True
+        # )
 
 
 if submitted:
@@ -142,4 +155,12 @@ if submitted:
                       state="complete", expanded=False)
 
     st.subheader("Here is your Trip Plan", anchor=False, divider="rainbow")
-    st.markdown(result)
+    if result:
+        try:
+            # Try rendering as Markdown first
+            st.markdown(result, unsafe_allow_html=True)
+        except:
+            # Fallback to plain text if formatting fails
+            st.text(result)
+    else:
+        st.error("❌ No trip plan was generated. Please try again.")
